@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IA POGER — Controlador</title>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div id="logo">IA POGER</div>
+      <nav>
+        <button data-panel="ia">IA</button>
+        <button data-panel="tools">Herramientas</button>
+        <button data-panel="sensors">Sensores</button>
+        <button data-panel="media">Multimedia</button>
+        <button data-panel="system">Sistema</button>
+        <button data-panel="lab">Laboratorio</button>
+      </nav>
+      <div id="quick-launch">
+        <small>Accesos</small>
+        <ul>
+          <li><a href="#" data-launch="https://chat.openai.com">Chat IA</a></li>
+          <li><a href="#" data-launch="https://suno.ai">Suno Música</a></li>
+          <li><a href="#" data-launch="https://example.com">Generador ideas</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main id="main">
+      <header>
+        <div id="title">Panel</div>
+        <div id="controls">
+          <button id="openAll">Abrir todo</button>
+          <button id="saveState">Guardar</button>
+        </div>
+      </header>
+
+      <section id="content">
+        <!-- Panel IA -->
+        <article class="panel" id="panel-ia">
+          <h2>IA</h2>
+          <div class="grid">
+            <div class="card">Chat IA</div>
+            <div class="card">Suno Música</div>
+            <div class="card">Generador de ideas</div>
+            <div class="card">Prompts IA</div>
+            <div class="card">Asistente personal</div>
+            <div class="card">IA Offline</div>
+          </div>
+        </article>
+
+        <!-- Panel Herramientas -->
+        <article class="panel" id="panel-tools" style="display:none">
+          <h2>Herramientas</h2>
+          <div class="grid">
+            <button class="card" data-tool="calc">Calculadora</button>
+            <button class="card" data-tool="level">Nivel</button>
+            <button class="card" data-tool="tape">Flexómetro</button>
+            <button class="card" data-tool="notes">Notas</button>
+          </div>
+        </article>
+
+        <!-- Panel Sensores -->
+        <article class="panel" id="panel-sensors" style="display:none">
+          <h2>Sensores</h2>
+          <div id="sensors-area">
+            <div class="sensor-row">
+              <button id="btn-motion">Activar movimiento</button>
+              <pre id="motion-output">No activado</pre>
+            </div>
+            <div class="sensor-row">
+              <button id="btn-orient">Activar orientación</button>
+              <pre id="orient-output">No activado</pre>
+            </div>
+            <div class="sensor-row">
+              <button id="btn-geo">Pedir ubicación</button>
+              <pre id="geo-output">No activado</pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- Panel Media -->
+        <article class="panel" id="panel-media" style="display:none">
+          <h2>Multimedia</h2>
+          <div class="grid">
+            <div class="card">
+              <button id="start-camera">Abrir cámara</button>
+              <video id="camera-preview" autoplay playsinline style="width:100%;border-radius:8px;display:none"></video>
+              <canvas id="camera-snap" style="display:none"></canvas>
+              <button id="snap" style="display:none">Capturar</button>
+            </div>
+            <div class="card">
+              <h3>Almacenamiento</h3>
+              <input id="noteText" placeholder="Nota rápida" />
+              <button id="saveNote">Guardar nota</button>
+              <ul id="notesList"></ul>
+            </div>
+          </div>
+        </article>
+
+        <!-- Panel Sistema -->
+        <article class="panel" id="panel-system" style="display:none">
+          <h2>Sistema</h2>
+          <div class="grid">
+            <div class="card">Información del navegador</div>
+            <div class="card" id="ua-info"></div>
+            <div class="card">Estado offline/online: <span id="online-state"></span></div>
+            <div class="card">Memoria local usada: <span id="ls-size"></span></div>
+          </div>
+        </article>
+
+        <!-- Panel Laboratorio -->
+        <article class="panel" id="panel-lab" style="display:none">
+          <h2>Laboratorio</h2>
+          <p>Funciones experimentales</p>
+          <button id="testVibrate">Vibrar</button>
+        </article>
+      </section>
+
+      <footer id="footer">IA POGER • Controlador general</footer>
+    </main>
+  </div>
+
+  <!-- permisos info -->
+  <div id="toast" class="hidden"></div>
+</body>
+</html>
+:root{
+  --bg:#0f1720; --panel:#0b1220; --accent:#0ea5a0; --card:#0e1a2a;
+  --muted:#9aa6b2; --glass: rgba(255,255,255,0.03);
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body,#app{height:100%;margin:0;background:var(--bg);color:#dbeafe}
+#app{display:flex;min-height:100vh}
+#sidebar{
+  width:260px;background:linear-gradient(180deg,#071022 0%, #071827 60%);
+  padding:18px;display:flex;flex-direction:column;gap:12px;border-right:1px solid rgba(255,255,255,0.03)
+}
+#logo{font-weight:700;font-size:1.05rem;color:var(--accent);margin-bottom:6px}
+#sidebar nav{display:flex;flex-direction:column;gap:8px}
+#sidebar button{
+  background:transparent;border:none;text-align:left;padding:10px;border-radius:8px;color:var(--muted);
+  cursor:pointer;font-size:0.95rem
+}
+#sidebar button:hover{background:var(--glass);color:#cfeef0}
+#quick-launch{margin-top:auto;font-size:0.8rem;color:var(--muted)}
+#quick-launch a{color:var(--muted);text-decoration:none;display:block;padding:6px 0}
+#main{flex:1;display:flex;flex-direction:column}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.03)}
+#title{font-weight:600}
+#controls button{margin-left:8px;padding:8px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:var(--muted);cursor:pointer}
+#content{padding:18px;overflow:auto;flex:1}
+.panel{margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:10px;min-height:70px;display:flex;align-items:center;justify-content:center}
+.sensor-row{display:flex;flex-direction:column;gap:8px}
+button.card{cursor:pointer;border:none}
+#footer{padding:12px 20px;border-top:1px solid rgba(255,255,255,0.02);font-size:0.85rem;color:var(--muted)}
+pre{background:rgba(0,0,0,0.25);padding:10px;border-radius:8px;overflow:auto}
+#toast{position:fixed;right:18px;bottom:18px;padding:12px 16px;border-radius:10px;background:#0b1220;border:1px solid rgba(255,255,255,0.03)}
+.hidden{display:none}
+
+/* mobile */
+@media (max-width:720px){
+  #sidebar{width:72px;padding:10px}
+  #sidebar button{font-size:0.7rem;padding:8px}
+  #logo{font-size:0.85rem;text-align:center}
+  #quick-launch{display:none}
+}
+// CONTROLADOR IA POGER - JS
+(function(){
+  // util
+  const $ = (sel,root=document)=> root.querySelector(sel);
+  const $$ = (sel,root=document)=> Array.from(root.querySelectorAll(sel));
+
+  function toast(msg, t=2000){
+    const el = $('#toast'); el.textContent = msg; el.classList.remove('hidden');
+    setTimeout(()=> el.classList.add('hidden'), t);
+  }
+
+  // panel switching
+  const buttons = $$('#sidebar button[data-panel]');
+  buttons.forEach(b=>{
+    b.addEventListener('click', ()=> {
+      const name = b.dataset.panel;
+      openPanel(name);
+    });
+  });
+
+  function openPanel(name){
+    const panels = $$('article.panel');
+    panels.forEach(p=> p.style.display = (p.id === 'panel-'+name ? '' : 'none'));
+    $('#title').textContent = name.toUpperCase();
+  }
+
+  // quick launch
+  $$('#quick-launch a').forEach(a=>{
+    a.addEventListener('click', e=>{
+      e.preventDefault();
+      const url = a.dataset.launch;
+      launchWeb(url);
+    });
+  });
+
+  function launchWeb(url){
+    // intenta abrir en nueva pestaña, si está en WebView abre en el mismo
+    try { window.open(url, '_blank'); } catch(e){ window.location.href = url; }
+  }
+
+  // SYSTEM INFO
+  function updateSystem(){
+    $('#ua-info').textContent = navigator.userAgent;
+    $('#online-state').textContent = navigator.onLine ? 'Online' : 'Offline';
+    $('#ls-size').textContent = (JSON.stringify(localStorage).length/1024).toFixed(2)+' KB';
+  }
+  updateSystem();
+  window.addEventListener('online', updateSystem);
+  window.addEventListener('offline', updateSystem);
+
+  // NOTES (local storage)
+  const notesKey = 'ia_poger_notes_v1';
+  function loadNotes(){
+    const arr = JSON.parse(localStorage.getItem(notesKey)||'[]');
+    const ul = $('#notesList'); ul.innerHTML='';
+    arr.forEach((n,i)=>{
+      const li = document.createElement('li');
+      li.textContent = n;
+      const d = document.createElement('button'); d.textContent='X'; d.style.marginLeft='8px';
+      d.onclick = ()=> { arr.splice(i,1); localStorage.setItem(notesKey,JSON.stringify(arr)); loadNotes(); };
+      li.appendChild(d);
+      ul.appendChild(li);
+    });
+  }
+  $('#saveNote').addEventListener('click', ()=>{
+    const t = $('#noteText').value.trim(); if(!t) return toast('Escribe algo');
+    const arr = JSON.parse(localStorage.getItem(notesKey)||'[]'); arr.unshift(t);
+    localStorage.setItem(notesKey, JSON.stringify(arr)); $('#noteText').value=''; loadNotes(); toast('Nota guardada');
+  });
+  loadNotes();
+
+  // CAMERA
+  let camStream = null;
+  $('#start-camera').addEventListener('click', async ()=>{
+    const video = $('#camera-preview'), snapBtn = $('#snap'), canvas = $('#camera-snap');
+    try{
+      camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
+      video.srcObject = camStream; video.style.display='block';
+      snapBtn.style.display='inline-block';
+      snapBtn.onclick = ()=> {
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video,0,0);
+        canvas.style.display='block';
+        // descarga la imagen
+        const data = canvas.toDataURL('image/jpeg',0.85);
+        const a = document.createElement('a'); a.href=data; a.download='snapshot.jpg'; a.click();
+      };
+    }catch(err){
+      toast('No se pudo acceder a la cámara: '+err.message,4000);
+    }
+  });
+
+  // SENSORS: movimiento y orientación
+  let motionEnabled=false, orientEnabled=false;
+  $('#btn-motion').addEventListener('click', async ()=>{
+    // iOS permissions
+    if(typeof DeviceMotionEvent !== 'undefined' && DeviceMotionEvent.requestPermission){
+      try{
+        const p = await DeviceMotionEvent.requestPermission();
+        if(p!=='granted'){ toast('Permiso denegado'); return; }
+      }catch(e){ /* ios older */ }
+    }
+    if(!motionEnabled){
+      window.addEventListener('devicemotion', handleMotion);
+      motionEnabled = true; $('#btn-motion').textContent='Desactivar movimiento';
+      toast('Movimiento activado');
+    } else {
+      window.removeEventListener('devicemotion', handleMotion);
+      motionEnabled = false; $('#btn-motion').textContent='Activar movimiento';
+      $('#motion-output').textContent='No activado';
+    }
+  });
+
+  function handleMotion(ev){
+    const a = ev.accelerationIncludingGravity || ev.acceleration || {};
+    $('#motion-output').textContent = `ax:${(a.x||0).toFixed(2)} ay:${(a.y||0).toFixed(2)} az:${(a.z||0).toFixed(2)}`;
+  }
+
+  $('#btn-orient').addEventListener('click', async ()=>{
+    if(typeof DeviceOrientationEvent !== 'undefined' && DeviceOrientationEvent.requestPermission){
+      try{
+        const p = await DeviceOrientationEvent.requestPermission();
+        if(p!=='granted'){ toast('Permiso denegado'); return; }
+      }catch(e){}
+    }
+    if(!orientEnabled){
+      window.addEventListener('deviceorientation', handleOrient);
+      orientEnabled = true; $('#btn-orient').textContent='Desactivar orientación';
+      toast('Orientación activada');
+    } else {
+      window.removeEventListener('deviceorientation', handleOrient);
+      orientEnabled=false; $('#btn-orient').textContent='Activar orientación';
+      $('#orient-output').textContent='No activado';
+    }
+  });
+
+  function handleOrient(ev){
+    $('#orient-output').textContent = `alpha:${(ev.alpha||0).toFixed(1)} beta:${(ev.beta||0).toFixed(1)} gamma:${(ev.gamma||0).toFixed(1)}`;
+  }
+
+  // GEOLOCATION
+  $('#btn-geo').addEventListener('click', ()=>{
+    if(!navigator.geolocation) return toast('Geolocalización no disponible');
+    navigator.geolocation.getCurrentPosition(pos=>{
+      $('#geo-output').textContent = `Lat:${pos.coords.latitude.toFixed(6)} Lon:${pos.coords.longitude.toFixed(6)} Acc:${pos.coords.accuracy}m`;
+    }, err=>{
+      $('#geo-output').textContent = 'Error: '+err.message;
+    }, {enableHighAccuracy:true, timeout:8000});
+  });
+
+  // VIBRATE
+  $('#testVibrate').addEventListener('click', ()=> {
+    if(navigator.vibrate) { navigator.vibrate([200,100,200]); toast('Vibrando'); }
+    else toast('Vibración no disponible');
+  });
+
+  // quick helpers
+  $('#openAll').addEventListener('click', ()=> {
+    // muestra panel IA y herramientas juntas (simple)
+    openPanel('ia'); toast('Abierto: IA');
+  });
+
+  $('#saveState').addEventListener('click', ()=> {
+    localStorage.setItem('ia_poger_state', JSON.stringify({lastPanel: $('#title').textContent, ts: Date.now()}));
+    toast('Estado guardado');
+    updateSystem();
+  });
+
+  // initial panel
+  openPanel('ia');
+
+  // safe fallback for sensors in desktop
+  window.addEventListener('error', e=> console.warn('error', e.message));
+})();
